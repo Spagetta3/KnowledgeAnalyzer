@@ -193,8 +193,8 @@ namespace DataAnalyzer
                 {
                     Console.WriteLine(e.InnerException.Message);
                 }
-                file.Close();
             }
+            file.Close();
 
             // nacitanie id s ktorymi pracujeme
             path = "C:\\Users\\Veronika\\Desktop\\LO\\lo_ids.txt";
@@ -1380,7 +1380,7 @@ namespace DataAnalyzer
                         }
                         else
                         {
-                            if (actualTime.TotalSeconds - firstTime.TotalSeconds > 4 && actualTime.TotalSeconds - firstTime.TotalSeconds < 480)
+                            if (actualTime.TotalSeconds - firstTime.TotalSeconds > 4 && actualTime.TotalSeconds - firstTime.TotalSeconds < 600)
                             {
                                 LOvisit lv = new LOvisit();
                                 lv.Id_user = userID;
@@ -1813,7 +1813,7 @@ namespace DataAnalyzer
                 string[] words = line.Split(';');
                 double tmp = Double.Parse(words[3]);
 
-                if (tmp > 4 && tmp < 480)
+                if (tmp > 4 && tmp < 600)
                 {
                     try
                     {
@@ -1858,13 +1858,13 @@ namespace DataAnalyzer
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(value.Id_user);
-                sb.Append(",");
+                sb.Append(";");
                 sb.Append(value.Id_lo);
-                sb.Append(",");
+                sb.Append(";");
                 sb.Append(value.WholeTime.ToString());
-                sb.Append(",");
+                sb.Append(";");
                 sb.Append(value.ActiveTime.ToString());
-                sb.Append(",");
+                sb.Append(";");
                 sb.Append(value.EyeTime.ToString());
 
                 file2.WriteLine(sb.ToString());
