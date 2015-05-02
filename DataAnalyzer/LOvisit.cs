@@ -19,6 +19,7 @@ namespace DataAnalyzer
         private double ari;
         private double lix;
         private double mouseActiveTime;
+        private double knowledgeGain;
 
         public string Id_lo { get { return id_lo; } set { id_lo = value; } }
         public string Id_user { get { return id_user; } set { id_user = value; } }
@@ -31,5 +32,6 @@ namespace DataAnalyzer
         public double Ari { get { return ari; } set { ari = value; } }
         public double Lix { get { return lix; } set { lix = value; } }
         public double MouseActiveTime { get { return mouseActiveTime; } set { mouseActiveTime = value; } }
+        public double KnowledgeGain { get { return knowledgeGain; } set { knowledgeGain = value; } }
     }
 }

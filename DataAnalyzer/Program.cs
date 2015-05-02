@@ -13,7 +13,155 @@ namespace DataAnalyzer
         public static DateTime _jan1st1970 = new DateTime(1970, 1, 1);
         static void Main(string[] args)
         {
-            GetKnowledgeForTests();
+            GetKnowledgeGain();
+        }
+
+        public static void GetKnowledgeGain()
+        {
+            // nacitaju sa spojene data z PagesEvaluator a PagesAndFaceEvaluator
+            string path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Data-server\\final_data_per_user.csv";
+            System.IO.StreamReader file = new System.IO.StreamReader(path);
+            string line;
+            Hashtable firstExplanations = new Hashtable();
+            Hashtable data = new Hashtable();
+
+            while ((line = file.ReadLine()) != null)
+            {
+                try
+                {
+                    string[] words = line.Split(';');
+                    LOvisit lo = new LOvisit();
+                    lo.Id_user = words[0];
+                    lo.Id_lo = words[1];
+                    lo.Ari = Double.Parse(words[2]);
+                    lo.Lix = Double.Parse(words[3]);
+                    lo.WholeTime = Double.Parse(words[4]);
+                    lo.ActiveTime = Double.Parse(words[5]);
+                    lo.EyeTime = Double.Parse(words[6]);
+                    lo.NumbOfScrolls = Int32.Parse(words[7]);
+                    lo.NumbOfClicks = Int32.Parse(words[8]);
+                    lo.MouseActiveTime = Double.Parse(words[9]);
+                    string key = lo.Id_user + "_" + lo.Id_lo;
+                    data.Add(key, lo);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                }
+            }
+            file.Close();
+
+            // nacita sa vedomost na zaklade uvodneho testu
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Testy-Lisp\\Vyhodnotenie\\Spreading2\\thirdKnowledgeSpread2.csv";
+            file = new System.IO.StreamReader(path);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                try
+                {
+                    string[] words = line.Split(';');
+                    ExplanationWithKnowledge ewk = new ExplanationWithKnowledge();
+                    ewk.UserID = words[0];
+                    ewk.ExplanationID = words[1];
+                    ewk.Knowledge = Double.Parse(words[2]);
+                    string key = ewk.UserID + "_" + ewk.ExplanationID;
+                    firstExplanations.Add(key, ewk);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                }
+            }
+            file.Close();
+
+            // nacita sa vedomost na zaklade druheho testu a vyrata sa ich rozdiel - narast vedomosti
+
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Testy-Lisp\\Vyhodnotenie\\Spreading2\\fourthKnowledgeSpread2.csv";
+            file = new System.IO.StreamReader(path);
+            Hashtable loKnowledge = new Hashtable();
+
+            while ((line = file.ReadLine()) != null)
+            {
+                try
+                {
+                    string[] words = line.Split(';');
+                    ExplanationWithKnowledge ewkSecond = new ExplanationWithKnowledge();
+                    ewkSecond.UserID = words[0];
+                    ewkSecond.ExplanationID = words[1];
+                    ewkSecond.Knowledge = Double.Parse(words[2]);
+                    string key = ewkSecond.UserID + "_" + ewkSecond.ExplanationID;
+                    ExplanationWithKnowledge ewkFirst = (ExplanationWithKnowledge) firstExplanations[key];
+                    LOvisit lo = (LOvisit) data[key];
+ 
+                    if (lo != null)
+                    {
+                        if (ewkFirst == null)
+                            lo.KnowledgeGain = 0;
+                        else
+                            lo.KnowledgeGain = ewkSecond.Knowledge - ewkFirst.Knowledge;
+
+                        loKnowledge.Add(key, lo);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                }
+            }
+            file.Close();
+
+            // prida sa zaznam pre vzdelavacie objekty, ktore nemali vyhodnotenu vedomost na zaklade druheho testu
+
+            foreach (DictionaryEntry entry in firstExplanations)
+            {
+                ExplanationWithKnowledge ewk = (ExplanationWithKnowledge) entry.Value;
+                string key = ewk.UserID + "_" + ewk.ExplanationID;
+                LOvisit lo = (LOvisit) data[key];
+                LOvisit loFinal = (LOvisit) loKnowledge[key];
+                if (lo != null && loFinal == null)
+                {
+                    lo.KnowledgeGain = 0;
+                    loKnowledge.Add(key, lo);
+                }
+            }
+
+            // data sa ulozia
+
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Testy-Lisp\\Vyhodnotenie\\3_4_knowledgeGain.csv";
+            System.IO.StreamWriter file2 = new System.IO.StreamWriter(path);
+
+            foreach (DictionaryEntry entry in loKnowledge)
+            {
+                LOvisit value = (LOvisit)entry.Value;
+                StringBuilder sb = new StringBuilder();
+                sb.Append(value.Id_user);
+                sb.Append(";");
+                sb.Append(value.Id_lo);
+                sb.Append(";");
+                sb.Append(value.KnowledgeGain);
+                sb.Append(";");
+                sb.Append(value.Ari.ToString());
+                sb.Append(";");
+                sb.Append(value.Lix.ToString());
+                sb.Append(";");
+                sb.Append(value.WholeTime.ToString());
+                sb.Append(";");
+                sb.Append(value.ActiveTime.ToString());
+                sb.Append(";");
+                sb.Append(value.EyeTime.ToString());
+                sb.Append(";");
+                sb.Append(value.NumbOfScrolls.ToString());
+                sb.Append(";");
+                sb.Append(value.NumbOfClicks.ToString());
+                sb.Append(";");
+                sb.Append(value.MouseActiveTime.ToString());
+
+                file2.WriteLine(sb.ToString());
+            }
+
+            file2.Close();
+        }
+
         public static void ConnectDataPerUser()
         {
             HashSet<LOvisit> lo_visits = new HashSet<LOvisit>();
