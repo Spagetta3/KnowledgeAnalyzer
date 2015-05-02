@@ -14,6 +14,131 @@ namespace DataAnalyzer
         static void Main(string[] args)
         {
             GetKnowledgeForTests();
+        public static void ConnectDataPerUser()
+        {
+            HashSet<LOvisit> lo_visits = new HashSet<LOvisit>();
+            Hashtable objects = new Hashtable();
+            string path = "C:\\Users\\Veronika\\Desktop\\LO\\results-ari-lix.csv";
+            System.IO.StreamReader file = new System.IO.StreamReader(path);
+            string line;
+
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] words = line.Split(',');
+                LearningObject lo = new LearningObject();
+                lo.ID = words[0];
+                lo.Ari = Double.Parse(words[1].Replace('.', ','));
+                lo.Lix = Double.Parse(words[2].Replace('.', ','));
+                objects.Add(lo.ID, lo);
+            }
+
+            file.Close();
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Statistiky\\statistics_new.csv";
+            file = new System.IO.StreamReader(path);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] words = line.Split(';');
+                LearningObject lo = (LearningObject)objects[words[1]];
+                if (lo != null)
+                {
+                    LOvisit value = new LOvisit();
+                    value.Id_user = words[0];
+                    value.Id_lo = words[1];
+                    value.WholeTime = Double.Parse(words[2]);
+                    value.ActiveTime = Double.Parse(words[3]);
+                    value.EyeTime = Double.Parse(words[4]);
+                    value.Ari = lo.Ari;
+                    value.Lix = lo.Lix;
+                    lo_visits.Add(value);
+                }
+            }
+
+            file.Close();
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Data-server\\mouse_activeTime.csv";
+            file = new System.IO.StreamReader(path);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] words = line.Split(',');
+
+                foreach (LOvisit value in lo_visits)
+                {
+                    if (value.Id_user == words[0] && value.Id_lo == words[1])
+                    {
+                        value.MouseActiveTime = Double.Parse(words[2]);
+                        break;
+                    }
+                }
+            }
+
+            file.Close();
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Data-server\\scrolls_count_per_user.csv";
+            file = new System.IO.StreamReader(path);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] words = line.Split(';');
+
+                foreach (LOvisit value in lo_visits)
+                {
+                    if (value.Id_user == words[0] && value.Id_lo == words[1])
+                    {
+                        value.NumbOfScrolls = Int32.Parse(words[2]);
+                        break;
+                    }
+                }
+            }
+
+            file.Close();
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Data-server\\clicks_count_per_user.csv";
+            file = new System.IO.StreamReader(path);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] words = line.Split(';');
+
+                foreach (LOvisit value in lo_visits)
+                {
+                    if (value.Id_user == words[0] && value.Id_lo == words[1])
+                    {
+                        value.NumbOfClicks = Int32.Parse(words[2]);
+                        break;
+                    }
+                }
+            }
+
+            file.Close();
+            path = "D:\\Dropbox\\Documents\\skola\\Diplomovka\\Experiment Lisp\\Data-server\\final_data_per_user.csv";
+            System.IO.StreamWriter file2 = new System.IO.StreamWriter(path);
+
+            foreach (LOvisit value in lo_visits)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(value.Id_user);
+                sb.Append(";");
+                sb.Append(value.Id_lo);
+                sb.Append(";");
+                sb.Append(value.Ari.ToString());
+                sb.Append(";");
+                sb.Append(value.Lix.ToString());
+                sb.Append(";");
+                sb.Append(value.WholeTime.ToString());
+                sb.Append(";");
+                sb.Append(value.ActiveTime.ToString());
+                sb.Append(";");
+                sb.Append(value.EyeTime.ToString());
+                sb.Append(";");
+                sb.Append(value.NumbOfScrolls.ToString());
+                sb.Append(";");
+                sb.Append(value.NumbOfClicks.ToString());
+                sb.Append(";");
+                sb.Append(value.MouseActiveTime.ToString());
+
+                file2.WriteLine(sb.ToString());
+            }
+
+            file2.Close();
         }
 
         public static void GetKnowledgeForTests()
