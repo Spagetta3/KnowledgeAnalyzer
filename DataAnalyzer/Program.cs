@@ -117,11 +117,12 @@ namespace DataAnalyzer
                     if (lo != null)
                     {
                         if (ewkFirst == null)
-                            lo.KnowledgeGain = 0;
+                            lo.KnowledgeGain = ewkSecond.Knowledge;
                         else
                             lo.KnowledgeGain = ewkSecond.Knowledge - ewkFirst.Knowledge;
 
-                        loKnowledge.Add(key, lo);
+                        if (lo.KnowledgeGain > 0)
+                            loKnowledge.Add(key, lo);
                     }
                 }
                 catch (Exception e)
@@ -133,7 +134,7 @@ namespace DataAnalyzer
 
             // prida sa zaznam pre vzdelavacie objekty, ktore nemali vyhodnotenu vedomost na zaklade druheho testu
 
-            foreach (DictionaryEntry entry in firstExplanations)
+            /*foreach (DictionaryEntry entry in firstExplanations)
             {
                 ExplanationWithKnowledge ewk = (ExplanationWithKnowledge)entry.Value;
                 string key = ewk.UserID + "_" + ewk.ExplanationID;
@@ -144,7 +145,7 @@ namespace DataAnalyzer
                     lo.KnowledgeGain = 0;
                     loKnowledge.Add(key, lo);
                 }
-            }
+            }*/
 
             // data sa ulozia
 
