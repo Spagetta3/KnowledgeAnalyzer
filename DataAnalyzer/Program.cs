@@ -13,7 +13,65 @@ namespace DataAnalyzer
         public static DateTime _jan1st1970 = new DateTime(1970, 1, 1);
         static void Main(string[] args)
         {
-            GetLengthOfLearningObjects();
+            ConnectLengthWithOtherData();
+        }
+
+        public static void ConnectLengthWithOtherData()
+        {
+            string line;
+            System.IO.StreamReader file = new System.IO.StreamReader(@"C:\\Users\\Veronika\\Desktop\\LO\\results-length.csv");
+            List<LearningObject> objects = new List<LearningObject>();
+            int counter = 0;
+
+            while ((line = file.ReadLine()) != null)
+            {
+                try
+                {
+                    string[] words = line.Split(';');
+                    LearningObject lo = new LearningObject();
+                    lo.ID = words[0];
+                    lo.Length = Int32.Parse(words[1]);
+                    objects.Add(lo);
+                    counter++;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                    Console.WriteLine(counter.ToString());
+                }
+            }
+
+            file.Close();
+
+            file = new System.IO.StreamReader(@"C:\\Users\\Veronika\\Desktop\\final-analyze-normovana.csv");
+            System.IO.StreamWriter file2 = new System.IO.StreamWriter(@"C:\\Users\\Veronika\\Desktop\\final-analyze-normovana2.csv");
+
+            while ((line = file.ReadLine()) != null)
+            {
+                try
+                {
+                    string[] words = line.Split(';');
+                    foreach (LearningObject value in objects)
+                    {
+                        if (value.ID == words[0])
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append(line);
+                            sb.Append(";");
+                            sb.Append(value.Length.ToString());
+                            file2.WriteLine(sb.ToString());
+                            break;
+                        }
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                }
+            }
+            file.Close();
+            file2.Close();
         }
 
         public static void GetLengthOfLearningObjects()
