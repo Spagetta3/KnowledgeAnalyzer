@@ -13,7 +13,84 @@ namespace DataAnalyzer
         public static DateTime _jan1st1970 = new DateTime(1970, 1, 1);
         static void Main(string[] args)
         {
-            GetKnowledgeGainForSelectedExplanations();
+            GetLengthOfLearningObjects();
+        }
+
+        public static void GetLengthOfLearningObjects()
+        {
+            string line;
+            System.IO.StreamReader file = new System.IO.StreamReader(@"C:\\Users\\Veronika\\Desktop\\LO\\lo_ids.txt");
+            List<string> lo_ids = new List<string>();
+            int counter = 0;
+
+            while ((line = file.ReadLine()) != null)
+            {
+                try
+                {
+                    string[] words = line.Split(',');
+                    lo_ids.Add(words[0]);
+                    counter++;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                    Console.WriteLine(counter.ToString());
+                }
+            }
+
+            file.Close();
+
+            List<LearningObject> objects = new List<LearningObject>();
+
+            foreach (string id in lo_ids)
+            {
+                LearningObject lo = new LearningObject();
+                lo.ID = id;
+                int chars = 0;
+
+
+                try
+                {
+                    // pootvarat subory a vyratat ARI, LIX, ulozit :)
+                    string path = "C:\\Users\\Veronika\\Desktop\\LO\\" + id + ".txt";
+                    file = new System.IO.StreamReader(path);
+
+                    while ((line = file.ReadLine()) != null && line != "")
+                    {
+                        string[] wordsInLine = line.Split(' ');
+
+                        foreach (string value in wordsInLine)
+                        {
+                            foreach (char c in value)
+                            {
+                                if (c != '.' && c != '?' && c != '!')
+                                    chars++;
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException.Message);
+                    Console.WriteLine(id.ToString());
+                }
+
+                lo.Length = chars;
+                objects.Add(lo);
+                file.Close();
+            }
+
+            System.IO.StreamWriter file2 = new System.IO.StreamWriter(@"C:\\Users\\Veronika\\Desktop\\LO\\results-length.csv");
+            foreach (LearningObject value in objects)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(value.ID);
+                sb.Append(";");
+                sb.Append(value.Length.ToString());
+
+                file2.WriteLine(sb.ToString());
+            }
+            file2.Close();
         }
 
         public static void GetKnowledgeGainForSelectedExplanations()
